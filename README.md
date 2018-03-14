@@ -12,14 +12,13 @@ industry for years. We decided to make this to open source project, so that we c
 
 ## About Coin2Fun
 
->Coin2Fun is the most reliable web application that provides 
->Ethereum lottery with cheap tickets to participate and earn big Ethereum rewards! 
+Coin2Fun is not scam ! We strive to make the most reliable web application that provides Ethereum lottery with cheap tickets to participate and earn big Ethereum rewards! 
 
 **Want to earn some Ether? then, you are at the right place!**
 
 ## How to Join the Game
 
->Every 0.001 ETH spent on Coin2Fun Lottery counts as one ticket to participate.
+Every 0.001 ETH spent on Coin2Fun Lottery counts as one ticket to participate.
 
 ## Coin2Fun Prize Payouts
 
