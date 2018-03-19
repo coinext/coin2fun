@@ -7,7 +7,7 @@
 ---
 
 <br>
-<h2 align="center">Thank you for your interest in Coin2Fun !</h2>
+    <h1 align="center">Thank you for your interest in Coin2Fun !</h1>
 <br>
 
 
@@ -33,8 +33,6 @@ Every 0.001 ETH spent on Coin2Fun Lottery counts as one ticket to participate.
 * 10% of a ticket sale is used for the next round of lottery.
 
 * 10% of a ticket sale is used for operating Coin2Fun project.
-
-<br>
 
 ## Contact Information
 
