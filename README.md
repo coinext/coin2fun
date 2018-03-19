@@ -1,8 +1,15 @@
-<img src="https://user-images.githubusercontent.com/20435620/37386537-41db3ab4-279c-11e8-9d84-2cca7aa49282.png" height="100"/> 
+<p align="center">
+  <a href="https://www.coin2fun.com" target="_blank">
+    <img src="https://user-images.githubusercontent.com/20435620/37386537-41db3ab4-279c-11e8-9d84-2cca7aa49282.png" height="100"/> 
+  </a>
+</p>
 
 ---
 
-# Thank you for your interest in Coin2Fun !
+<br>
+<h2 align="center">Thank you for your interest in Coin2Fun !</h2>
+<br>
+
 
 ## How this project is started 
 
@@ -27,7 +34,7 @@ Every 0.001 ETH spent on Coin2Fun Lottery counts as one ticket to participate.
 
 * 10% of a ticket sale is used for operating Coin2Fun project.
 
----
+<br>
 
 ## Contact Information
 
