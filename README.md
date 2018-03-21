@@ -26,6 +26,10 @@ Want to earn some Ether? then, you are at the right place!
 
 Every 0.001 ETH spent on Coin2Fun Lottery counts as one ticket to participate.
 
+<img width="406" alt="how to join the game" src="https://user-images.githubusercontent.com/34642220/37691438-6c686ee2-2cf5-11e8-9e1c-9f808d5e0891.png">
+
+
+
 ## Coin2Fun Prize Payouts
 
 * 80% of a ticket sale goes back to the winners in ETH
