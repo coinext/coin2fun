@@ -1,11 +1,8 @@
 pragma solidity ^0.4.20;
 
 // Author: Booyoun Kim
-// Date: 8 February 2019
-// Version: Lotto v0.1.0
-
-// Changelog
-// 
+// Date: 26 March 2019
+// Version: Lotto v0.1.1
 
 import "github.com/oraclize/ethereum-api/oraclizeAPI.sol";
 
@@ -16,16 +13,9 @@ contract Lotto is usingOraclize {
 	bool roundOpen = true;
 	uint totalAmount;
 
-	// // 당첨 순위에 따른 당첨자 수
-	// uint[3] winnerPersonNumArray = [1, 2, 3];
-	// // 순서에 따른 당첨 등수
-	// uint[6] winnerRankByOrder = [1, 2, 2, 3, 3, 3];
-
 	Buyer[] public buyers;
-	// 1등 1명만 추첨
 	Winner[1] public winner;
 
-	// 컨트랙트가 생성되는 순간에 단 한번만 실행된다.
 	function Lotto() {
 		owner = msg.sender;
 		alarm();
@@ -54,9 +44,10 @@ contract Lotto is usingOraclize {
 	}
 
 	function alarm() private {
-		// 60 * 60 * 24 * 30
-		// 테스트: 5분 후 게임 종료
-    	oraclize_query(60 * 60 * 12 + 23, "URL", "");
+		// 2018년 3월 24일 오전 10:56 시작
+		// 2018년 3월 31일 밤 12시 정각에 종료
+		// 7일 + 13시간 + 1분
+    	oraclize_query(60 * 60 * 24 * 7 + 60 * 60 * 13 + 60 * 1, "URL", "");
     }
 
     function __callback(bytes32 myid, string result) {
@@ -87,7 +78,7 @@ contract Lotto is usingOraclize {
 		uint totalTicketNum = getTicketTotalNum();
 
 		// random = uint(sha3(block.timestamp)) % max;		// 0 ~ (max - 1)
-		uint random = uint(sha3(block.timestamp - saltNum)) % totalTicketNum + 1;
+		uint random = uint(sha3(block.timestamp - saltNum)) % totalTicketNum;
 		return random;
 	}
 
@@ -115,22 +106,6 @@ contract Lotto is usingOraclize {
 	function calPrizeForOnePersonByRanking(uint ranking) constant returns (uint) {
 		// 전체금액의 80%는 상금으로 사용. 나머지 10%는 다음 상금 시드머니로 사용되고 10%는 운영자금으로 사용
 		uint prize = this.balance * 8 / 10;
-
-		// if (ranking == 1) {
-		// 	prize = amount * 72 / 100;
-		// } else if (ranking == 2) {
-		// 	prize = amount * 12 / 100;
-		// } else if (ranking == 3) {
-		// 	// 9% 인데 3명이라서 9/3 = 3
-		// 	prize = amount * 3 / 100;
-		// } else if (ranking == 4) {
-		// 	// 5% 인데 5명이라서 5/5 = 1
-		// 	prize = amount * 1 / 100;
-		// } else if (ranking == 5) {
-		// 	// 2%인데 8명이라서 2/8 = 0.25
-		// 	prize = amount * 25 / 10000;
-		// }
-
 		return prize;
 	}
 
