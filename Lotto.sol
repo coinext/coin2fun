@@ -11,14 +11,16 @@ contract Lotto is usingOraclize {
 	address owner;
 	uint selectedNum;
 	bool roundOpen = true;
-	uint totalAmount;
+	// uint totalAmount;
 
 	Buyer[] public buyers;
-	Winner[1] public winner;
+	Winner[] public winner;
 
 	function Lotto() {
 		owner = msg.sender;
-		alarm();
+
+		winner.length += 1;
+		alarm(60 * 5);
 	}
 
     modifier onlyOwner() {
@@ -43,37 +45,36 @@ contract Lotto is usingOraclize {
 		uint selectedNum;
 	}
 
-	function alarm() private {
-		// 2018년 3월 24일 오전 10:56 시작
-		// 2018년 3월 31일 밤 12시 정각에 종료
-		// 7일 + 13시간 + 1분
-    	oraclize_query(60 * 60 * 24 * 7 + 60 * 60 * 13 + 60 * 1, "URL", "");
+	function alarm(uint delayTime) private {
+		// 6 days + 16 hours + 45 minutes
+    	// oraclize_query(60 * 60 * 24 * 6 + 60 * 60 * 16 + 60 * 45, "URL", "");
+    	// 5분 뒤
+    	oraclize_query(delayTime, "URL", "");
     }
 
     function __callback(bytes32 myid, string result) {
         if (msg.sender != oraclize_cbAddress()) throw;
-        // do something, 1 day after contract creation
 		closeRound();
     }
 
 	function closeRound() private {
 		roundOpen = false;
 
-		// 당첨자 선택
-		// 1등
-		winner[0].selectedNum 	= getRandomNum(0);
-		winner[0].winnerId 		= findBuyerIdBySelectedNum(winner[0].selectedNum);
-		winner[0].winnerAddr 	= buyers[winner[0].winnerId].addr;
-		winner[0].prize 		= calPrizeForOnePersonByRanking(1);
+		uint winnerOrder = winner.length - 1;
 
-		// 1등 출금
-		withdraw(winner[0].winnerId, winner[0].prize);
+		// select winner
+		winner[winnerOrder].selectedNum 	= getRandomNum(0);
+		winner[winnerOrder].winnerId 		= findBuyerIdBySelectedNum(winner[winnerOrder].selectedNum);
+		winner[winnerOrder].winnerAddr 		= buyers[winner[winnerOrder].winnerId].addr;
+		winner[winnerOrder].prize 			= this.balance * 8 / 10;
+
+		// winner withdraw
+		withdraw(winner[winnerOrder].winnerId, winner[winnerOrder].prize);
 		
-		// 운영자 출금(남은 잔액 20%)
-		owner.transfer(this.balance);
+		// withdraw remain 20% -> 10% (10%는 남겨두기)
+		owner.transfer(this.balance / 2);
 	}
 
-	// 전체 티켓 중 하나 랜덤으로 선택
 	function getRandomNum(uint saltNum) constant returns (uint) {
 		uint totalTicketNum = getTicketTotalNum();
 
@@ -82,41 +83,34 @@ contract Lotto is usingOraclize {
 		return random;
 	}
 
-	// 랜덤으로 선택된 추첨 번호표의 buyerId 를 찾는다
 	function findBuyerIdBySelectedNum(uint selectedRandomNum) private returns (uint) {
-		// selectedRandomNum : 추첨 번호표
 		uint selectId;
 
 		for (uint i = 0; i < buyers.length; i++) {
 			if (selectedRandomNum > buyers[i].amount / 1000000000000000) {
 				selectedRandomNum -= buyers[i].amount / 1000000000000000;
 			} else {
-				// i 번째가 winner 
+				// i == winner 
 				selectId = i;
 				break;
 			}
 		}
 
-		// selectId : 당첨자 id
+		// selectId : winner id
 		return selectId;
 	}
 
-	// 상금 계산
-	// function calPrizeForOnePersonByRanking(uint ranking) private returns (uint) {
-	function calPrizeForOnePersonByRanking(uint ranking) constant returns (uint) {
-		// 전체금액의 80%는 상금으로 사용. 나머지 10%는 다음 상금 시드머니로 사용되고 10%는 운영자금으로 사용
-		uint prize = this.balance * 8 / 10;
-		return prize;
-	}
+	// function calPrizeForOnePersonByRanking(uint ranking) constant returns (uint) {
+	// 	uint prize = this.balance * 8 / 10;
+	// 	return prize;
+	// }
 
-	// winner 에게 출금
 	function withdraw(uint id, uint amount) private {
 		if (amount > 0) {
 			buyers[id].addr.transfer(amount);
 		}
     }
 
-	// 총 티켓 수
 	function getTicketTotalNum() constant returns (uint) {
 		uint sum = 0;
 		if (buyers.length > 0) {
@@ -143,19 +137,41 @@ contract Lotto is usingOraclize {
 		return buyers.length;
 	}
 
+	function reset() onlyOwner {
+		// buyers 초기화
+		buyers.length = 0;
+
+		// 다음 winner 배열 준비
+		winner.length += 1;
+		// uint id = buyers.length - 1;
+
+		roundOpen = true;
+		selectedNum = 0;
+		
+		alarm(60 * 5);
+	}
+
+	// 이더 출금
+    function withdraw(uint amount) onlyOwner {
+        msg.sender.transfer(amount);
+    }
+
     function() payable {
     	if (msg.sender == 0x1B17eB8FAE3C28CB2463235F9D407b527ba4e6Dd) {
-    		// 운영자가 입금하는 상금
+    		// prize from owner
     		return;
     	}
 
-    	// 티켓 1장은 0.001 ETH 이다. 그 미만은 무시된다.
+    	// 1 ticket = 0.001 ETH
+    	// below 0.001 is ignored.
     	if (roundOpen == true && msg.value >= 1000000000000000) {
     		buyers.length += 1;
 			uint id = buyers.length - 1;
 			
+			// buyerId[msg.sender] = id;  
+			
 			buyers[id].id 	= id;
-			// 기존 티켓 번호표(아래 amount 보다 위에 있어야 한다)
+			// 'startIssueNum' should be above the 'buyers[id].amount'.
 			uint startIssueNum = getTicketTotalNum();
 			buyers[id].startIssueNum = startIssueNum;
 			buyers[id].addr = msg.sender;
